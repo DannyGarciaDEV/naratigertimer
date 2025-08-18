@@ -10,9 +10,8 @@ function PhotoismBooth() {
   const [timeLeft, setTimeLeft] = useState(600);
   const [isRunning, setIsRunning] = useState(false);
   const [nameInput, setNameInput] = useState("");
-  const [message, setMessage] = useState(""); // <-- added state for inline message
+  const [showFullScreenMessage, setShowFullScreenMessage] = useState(false); // <-- fullscreen message state
 
-  // Listen for updates from server
   useEffect(() => {
     const handleStateUpdate = ({ queue, currentUser, timeLeft, isRunning }) => {
       setQueue(queue);
@@ -28,7 +27,6 @@ function PhotoismBooth() {
     socket.on("stateUpdate", handleStateUpdate);
     socket.on("timerEnded", handleTimerEnded);
 
-    // Stop timer if user leaves or reloads
     const handleUnload = () => {
       if (currentUser) {
         socket.emit("pauseTimer");
@@ -50,13 +48,11 @@ function PhotoismBooth() {
     socket.emit("addUser", nameInput);
     setNameInput("");
 
-    // Show inline message
-    setMessage(
-      "Please follow the instructions of Photoism or if you have any questions, ask KPN staff."
-    );
+    // Show fullscreen message
+    setShowFullScreenMessage(true);
 
-    // Hide message after 5 seconds
-    setTimeout(() => setMessage(""), 5000);
+    // Hide after 5 seconds
+    setTimeout(() => setShowFullScreenMessage(false), 5000);
   };
 
   const startNext = () => socket.emit("startNext");
@@ -71,12 +67,18 @@ function PhotoismBooth() {
 
   return (
     <div className="booth-container">
+      {/* Fullscreen message overlay */}
+      {showFullScreenMessage && (
+        <div className="fullscreen-message">
+          Please follow the instructions of Photoism or if you have any questions, ask KPN staff.
+        </div>
+      )}
+
       <h1>Photoism Booth</h1>
 
       <div className="booth-main">
-        {/* Left: Controls & Queue */}
         <div className="booth-content">
-          <h2>Current User: {currentUser || "nobody in queue"}</h2>
+          <h2>Current User: {currentUser || "None"}</h2>
           <div className="timer">
             {currentUser ? formatTime(timeLeft) : "Waiting..."}
           </div>
@@ -98,9 +100,6 @@ function PhotoismBooth() {
             ))}
           </ul>
 
-          {/* Inline message */}
-          {message && <div className="message">{message}</div>}
-
           <input
             type="text"
             value={nameInput}
@@ -110,7 +109,6 @@ function PhotoismBooth() {
           <button onClick={addUser}>Add to Queue</button>
         </div>
 
-        {/* Right: Nara Tiger Image */}
         <div className="booth-image">
           <img src="/nara.webp" alt="Nara Tiger" />
         </div>
