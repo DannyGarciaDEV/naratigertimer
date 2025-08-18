@@ -1,0 +1,3 @@
+[submodule "photoism-app"]
+	path = photoism-app
+	url = https://github.com/DannyGarciaDEV/naratimer.git

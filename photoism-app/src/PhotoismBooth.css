@@ -1,0 +1,141 @@
+/* Main container */
+.booth-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Nested flex for content + image */
+.booth-main {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Content side */
+.booth-content {
+  flex: 1;
+  padding-right: 20px;
+  text-align: center;
+}
+
+/* Image side */
+.booth-image img {
+  max-width: 200px;
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Headings */
+.booth-container h1 {
+  font-size: 2.5rem;
+  color: #000000;
+  margin-bottom: 15px;
+}
+
+.booth-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Timer */
+.timer {
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #8135f4;
+}
+
+/* Queue list */
+.queue-list {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+  width: 100%;
+}
+
+.queue-list li {
+  background: #e3f2fd;
+  margin: 5px 0;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+/* Input and buttons */
+input {
+  padding: 12px;
+  width: 70%;
+  max-width: 300px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #be76fa;
+  color: white;
+  margin: 5px;
+  transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #8135f4;
+}
+
+button:disabled {
+  background-color: #90caf9;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+  .booth-main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .booth-content {
+    padding-right: 0;
+  }
+
+  .booth-image img {
+    max-width: 80%;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .timer {
+    font-size: 3rem;
+  }
+
+  .queue-list li {
+    font-size: 1rem;
+    padding: 8px;
+  }
+
+  input {
+    width: 80%;
+  }
+}
