@@ -10,6 +10,7 @@ function PhotoismBooth() {
   const [timeLeft, setTimeLeft] = useState(600);
   const [isRunning, setIsRunning] = useState(false);
   const [nameInput, setNameInput] = useState("");
+  const [message, setMessage] = useState(""); // <-- added state for inline message
 
   // Listen for updates from server
   useEffect(() => {
@@ -45,8 +46,17 @@ function PhotoismBooth() {
 
   const addUser = () => {
     if (!nameInput.trim()) return;
+
     socket.emit("addUser", nameInput);
     setNameInput("");
+
+    // Show inline message
+    setMessage(
+      "Please follow the instructions of Photoism or if you have any questions, ask KPN staff."
+    );
+
+    // Hide message after 5 seconds
+    setTimeout(() => setMessage(""), 5000);
   };
 
   const startNext = () => socket.emit("startNext");
@@ -66,7 +76,7 @@ function PhotoismBooth() {
       <div className="booth-main">
         {/* Left: Controls & Queue */}
         <div className="booth-content">
-          <h2>Current User: {currentUser || "None"}</h2>
+          <h2>Current User: {currentUser || "nobody in queue"}</h2>
           <div className="timer">
             {currentUser ? formatTime(timeLeft) : "Waiting..."}
           </div>
@@ -87,6 +97,9 @@ function PhotoismBooth() {
               <li key={idx}>{name}</li>
             ))}
           </ul>
+
+          {/* Inline message */}
+          {message && <div className="message">{message}</div>}
 
           <input
             type="text"
