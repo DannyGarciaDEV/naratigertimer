@@ -1,11 +1,19 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" },
+});
+
+// Serve React build in production
+app.use(express.static(path.join(__dirname, "photoism-app", "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "photoism-app", "build", "index.html"));
 });
 
 let queue = [];
@@ -101,7 +109,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start server
-server.listen(4000, () => {
-  console.log("Server listening on port 4000");
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
