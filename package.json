@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "cd photoism-app && npm install && npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
