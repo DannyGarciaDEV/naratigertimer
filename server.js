@@ -9,10 +9,6 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-// ✅ Serve React build (works in production)
-const buildPath = path.join(__dirname, "photoism-app", "build");
-app.use(express.static(buildPath));
-
 
 
 // === Timer & Queue Logic ===
