@@ -13,11 +13,7 @@ const io = new Server(server, {
 const buildPath = path.join(__dirname, "photoism-app", "build");
 app.use(express.static(buildPath));
 
-// ✅ Use correct wildcard for all remaining routes
-// For Express v5+, "*" is invalid → use "/*"
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(buildPath, "index.html"));
-});
+
 
 // === Timer & Queue Logic ===
 let queue = [];
