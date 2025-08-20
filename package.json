@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "npm install && node server.js",
     "dev": "concurrently \"nodemon server.js\" \"npm run start-client\"",
     "start-client": "cd photoism-app && npm start",
     "build-client": "cd photoism-app && npm install && npm run build"
