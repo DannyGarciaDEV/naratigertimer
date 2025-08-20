@@ -1,12 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { io } from "socket.io-client";
+import React, { useState, useEffect, useRef } from "react";
 import "./PhotoismBooth.css";
-
-const socket = io(
-  process.env.NODE_ENV === "production"
-    ? "/" // Production: same server
-    : "http://localhost:4000" // Dev: backend port
-);
+import kpopHeader from "./kpop.webp"; // ✅ Import the image (must be in src folder)
 
 function PhotoismBooth() {
   const [queue, setQueue] = useState([]);
@@ -16,47 +10,52 @@ function PhotoismBooth() {
   const [nameInput, setNameInput] = useState("");
   const [showFullScreenMessage, setShowFullScreenMessage] = useState(false);
 
+  const timerRef = useRef(null);
+
+  // Handle Timer
   useEffect(() => {
-    const handleStateUpdate = ({ queue, currentUser, timeLeft, isRunning }) => {
-      setQueue(queue);
-      setCurrentUser(currentUser);
-      setTimeLeft(timeLeft);
-      setIsRunning(isRunning);
-    };
+    if (isRunning && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
 
-    const handleTimerEnded = (user) => {
-      alert(`${user}'s session ended!`);
-    };
+    return () => clearInterval(timerRef.current);
+  }, [isRunning, timeLeft]);
 
-    socket.on("stateUpdate", handleStateUpdate);
-    socket.on("timerEnded", handleTimerEnded);
-
-    const handleUnload = () => {
-      if (currentUser) {
-        socket.emit("pauseTimer");
-        socket.emit("userLeft", currentUser);
-      }
-    };
-    window.addEventListener("beforeunload", handleUnload);
-
-    return () => {
-      socket.off("stateUpdate", handleStateUpdate);
-      socket.off("timerEnded", handleTimerEnded);
-      window.removeEventListener("beforeunload", handleUnload);
-    };
-  }, [currentUser]);
+  useEffect(() => {
+    if (timeLeft === 0 && currentUser) {
+      alert(`${currentUser}'s session ended!`);
+      startNext();
+    }
+  }, [timeLeft]);
 
   const addUser = () => {
     if (!nameInput.trim()) return;
-    socket.emit("addUser", nameInput);
+    setQueue((prev) => [...prev, nameInput.trim()]);
     setNameInput("");
     setShowFullScreenMessage(true);
     setTimeout(() => setShowFullScreenMessage(false), 5000);
   };
 
-  const startNext = () => socket.emit("startNext");
-  const startTimer = () => socket.emit("startTimer");
-  const pauseTimer = () => socket.emit("pauseTimer");
+  const startNext = () => {
+    if (queue.length > 0) {
+      const nextUser = queue[0];
+      setCurrentUser(nextUser);
+      setQueue((prev) => prev.slice(1));
+      setTimeLeft(600);
+      setIsRunning(false);
+    } else {
+      setCurrentUser(null);
+      setTimeLeft(600);
+      setIsRunning(false);
+    }
+  };
+
+  const startTimer = () => setIsRunning(true);
+  const pauseTimer = () => setIsRunning(false);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -66,21 +65,27 @@ function PhotoismBooth() {
 
   return (
     <div className="booth-container">
+      {/* ✅ Fullscreen message */}
       {showFullScreenMessage && (
         <div className="fullscreen-message">
           Please follow the instructions of Photoism or ask KPN staff.
         </div>
       )}
 
+      {/* ✅ Header Image */}
+      <header className="booth-header">
+        <img src={kpopHeader} alt="K-pop Header" className="kpop-header-img" />
+      </header>
+
       <h1>Photoism Booth</h1>
       <div className="booth-main">
         <div className="booth-content">
-          <h2>Current User: {currentUser || "None"}</h2>
+          <h2>Current User: {currentUser || "Nobody waiting"}</h2>
           <div className="timer">
             {currentUser ? formatTime(timeLeft) : "Waiting..."}
           </div>
 
-          <div>
+          <div className="controls">
             <button onClick={startTimer} disabled={!currentUser || isRunning}>
               Start
             </button>
@@ -101,13 +106,9 @@ function PhotoismBooth() {
             type="text"
             value={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
-            placeholder="Enter name"
+            placeholder="Enter your name"
           />
-          <button onClick={addUser}>Add to Queue</button>
-        </div>
-
-        <div className="booth-image">
-          <img src="/nara.webp" alt="Nara Tiger" />
+          <button onClick={addUser}>Add</button>
         </div>
       </div>
     </div>

@@ -31,6 +31,19 @@
   animation: fadeInOut 5s forwards;
 }
 
+.booth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nara-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
 /* optional fade animation */
 @keyframes fadeInOut {
   0% { opacity: 0; }
@@ -134,6 +147,18 @@ button:disabled {
   background-color: #90caf9;
   cursor: not-allowed;
 }
+
+.booth-header {
+  text-align: center;
+
+}
+
+.kpop-header-img {
+  width: 80%;
+  max-height: 200px;
+ 
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 700px) {
