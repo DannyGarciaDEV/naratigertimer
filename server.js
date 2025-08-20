@@ -9,27 +9,29 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-// Serve React build in production
-app.use(express.static(path.join(__dirname, "photoism-app", "build")));
+// ✅ Serve React build (works in production)
+const buildPath = path.join(__dirname, "photoism-app", "build");
+app.use(express.static(buildPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "photoism-app", "build", "index.html"));
+// ✅ Use correct wildcard for all remaining routes
+// For Express v5+, "*" is invalid → use "/*"
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(buildPath, "index.html"));
 });
 
+// === Timer & Queue Logic ===
 let queue = [];
 let currentUser = null;
-let timeLeft = 600; // 10 minutes default
+let timeLeft = 600; // 10 min
 let isRunning = false;
 let timerInterval = null;
 
-// Emit current state to all clients
 const emitState = () => {
   io.emit("stateUpdate", { queue, currentUser, timeLeft, isRunning });
 };
 
-// Start the timer
 const startTimer = () => {
-  if (!currentUser || isRunning) return; // prevent double starts
+  if (!currentUser || isRunning) return;
   isRunning = true;
 
   if (timerInterval) clearInterval(timerInterval);
@@ -37,26 +39,24 @@ const startTimer = () => {
   timerInterval = setInterval(() => {
     if (!isRunning) return;
 
-    timeLeft -= 1; // decrement by 1 second
+    timeLeft -= 1;
 
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       isRunning = false;
       io.emit("timerEnded", currentUser);
-      startNext(); // automatically move to next user
+      startNext();
     }
 
     emitState();
   }, 1000);
 };
 
-// Pause the timer
 const pauseTimer = () => {
   isRunning = false;
   clearInterval(timerInterval);
 };
 
-// Move to next user
 const startNext = () => {
   if (queue.length === 0) {
     currentUser = null;
@@ -72,7 +72,7 @@ const startNext = () => {
   emitState();
 };
 
-// Socket.io events
+// === Socket.io Events ===
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
   emitState();
@@ -111,5 +111,5 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
