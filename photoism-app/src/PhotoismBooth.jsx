@@ -4,16 +4,17 @@ import "./PhotoismBooth.css";
 
 const socket = io(
   process.env.NODE_ENV === "production"
-    ? "/"             // Production: same server
-    : "http://localhost:4000"  // Dev: backend port
+    ? "/" // Production: same server
+    : "http://localhost:4000" // Dev: backend port
 );
+
 function PhotoismBooth() {
   const [queue, setQueue] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [timeLeft, setTimeLeft] = useState(600);
   const [isRunning, setIsRunning] = useState(false);
   const [nameInput, setNameInput] = useState("");
-  const [showFullScreenMessage, setShowFullScreenMessage] = useState(false); // <-- fullscreen message state
+  const [showFullScreenMessage, setShowFullScreenMessage] = useState(false);
 
   useEffect(() => {
     const handleStateUpdate = ({ queue, currentUser, timeLeft, isRunning }) => {
@@ -47,14 +48,9 @@ function PhotoismBooth() {
 
   const addUser = () => {
     if (!nameInput.trim()) return;
-
     socket.emit("addUser", nameInput);
     setNameInput("");
-
-    // Show fullscreen message
     setShowFullScreenMessage(true);
-
-    // Hide after 5 seconds
     setTimeout(() => setShowFullScreenMessage(false), 5000);
   };
 
@@ -70,15 +66,13 @@ function PhotoismBooth() {
 
   return (
     <div className="booth-container">
-      {/* Fullscreen message overlay */}
       {showFullScreenMessage && (
         <div className="fullscreen-message">
-          Please follow the instructions of Photoism or if you have any questions, ask KPN staff.
+          Please follow the instructions of Photoism or ask KPN staff.
         </div>
       )}
 
       <h1>Photoism Booth</h1>
-
       <div className="booth-main">
         <div className="booth-content">
           <h2>Current User: {currentUser || "None"}</h2>

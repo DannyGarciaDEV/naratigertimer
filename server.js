@@ -9,14 +9,15 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-// Serve React build
-const buildPath = path.join(__dirname, "photoism-app", "build");
-app.use(express.static(buildPath));
+// === Serve React build in production ===
+if (process.env.NODE_ENV === "production") {
+  const buildPath = path.join(__dirname, "photoism-app", "build");
+  app.use(express.static(buildPath));
 
-// Serve React app for all routes
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(buildPath, "index.html"));
-});
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(buildPath, "index.html"));
+  });
+}
 
 // === Timer & Queue Logic ===
 let queue = [];
@@ -32,6 +33,7 @@ const emitState = () => {
 const startTimer = () => {
   if (!currentUser || isRunning) return;
   isRunning = true;
+
   if (timerInterval) clearInterval(timerInterval);
 
   timerInterval = setInterval(() => {
@@ -74,9 +76,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startNext", startNext);
-
   socket.on("startTimer", startTimer);
-
   socket.on("pauseTimer", pauseTimer);
 
   socket.on("userLeft", (user) => {
@@ -94,7 +94,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Use Railway's port
+// Use Railway port or default 4000
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
