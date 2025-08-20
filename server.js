@@ -9,7 +9,14 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
+// Serve React build
+const buildPath = path.join(__dirname, "photoism-app", "build");
+app.use(express.static(buildPath));
 
+// Serve React app for all routes
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(buildPath, "index.html"));
+});
 
 // === Timer & Queue Logic ===
 let queue = [];
@@ -25,7 +32,6 @@ const emitState = () => {
 const startTimer = () => {
   if (!currentUser || isRunning) return;
   isRunning = true;
-
   if (timerInterval) clearInterval(timerInterval);
 
   timerInterval = setInterval(() => {
@@ -50,17 +56,10 @@ const pauseTimer = () => {
 };
 
 const startNext = () => {
-  if (queue.length === 0) {
-    currentUser = null;
-    timeLeft = 600;
-    isRunning = false;
-    clearInterval(timerInterval);
-  } else {
-    currentUser = queue.shift();
-    timeLeft = 600;
-    isRunning = false;
-    clearInterval(timerInterval);
-  }
+  currentUser = queue.shift() || null;
+  timeLeft = 600;
+  isRunning = false;
+  clearInterval(timerInterval);
   emitState();
 };
 
@@ -76,15 +75,9 @@ io.on("connection", (socket) => {
 
   socket.on("startNext", startNext);
 
-  socket.on("startTimer", () => {
-    startTimer();
-    emitState();
-  });
+  socket.on("startTimer", startTimer);
 
-  socket.on("pauseTimer", () => {
-    pauseTimer();
-    emitState();
-  });
+  socket.on("pauseTimer", pauseTimer);
 
   socket.on("userLeft", (user) => {
     if (user === currentUser) {
@@ -101,7 +94,8 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 4000; // Railway will use the env port
+// Use Railway's port
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });

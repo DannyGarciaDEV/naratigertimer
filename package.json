@@ -4,22 +4,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "server": "nodemon server.js",
-    "client": "npm start --prefix photoism-app",
-    "install-client": "npm install --prefix photoism-app",
-    "build-client": "npm run build --prefix photoism-app",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
-  },
-  "engines": {
-    "node": "18.x"
+    "build-client": "cd photoism-app && npm install && npm run build"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^4.21.2",
     "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "concurrently": "^9.2.0",
-    "nodemon": "^3.1.10"
   }
 }
