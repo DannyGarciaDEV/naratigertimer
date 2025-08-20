@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import "./PhotoismBooth.css";
 
-const socket = io("http://localhost:4000");
-
+const socket = io(
+  process.env.NODE_ENV === "production"
+    ? "/"             // Production: same server
+    : "http://localhost:4000"  // Dev: backend port
+);
 function PhotoismBooth() {
   const [queue, setQueue] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
